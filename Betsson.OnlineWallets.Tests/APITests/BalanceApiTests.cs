@@ -1,12 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Betsson.OnlineWallets.Tests.Models;
+using FluentAssertions;
+using System.Net;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
-    internal class BalanceApiTests
+    public class BalanceApiTests : TestBase
     {
+        [Fact]
+        public async Task ValidateBalanceResponseSuccessfulCode()
+        {
+            //      Act
+            // Send the balance request
+            var response = await _client.GetAsync(RequestHelper.BalanceEndpoint);
+
+            //      Assert
+            // Ensure that the response returns a 200 status code
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task ValidateBalanceAmountIsNonNegative()
+        {
+            //      Arrange
+            //  Get the balance from the API
+            var balance = await GetBalance();
+
+            // Assert
+            // Ensure the balance object is not null
+            balance.Should().NotBeNull();
+
+            // Ensure that the balance amount is zero or greater 
+            balance.Amount.Should().BeGreaterThanOrEqualTo(0);
+        }
     }
 }

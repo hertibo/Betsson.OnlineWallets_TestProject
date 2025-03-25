@@ -24,4 +24,3 @@ namespace Betsson.OnlineWallets.Tests.Models
         }
     }
 }
-}
