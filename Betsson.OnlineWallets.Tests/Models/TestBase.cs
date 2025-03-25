@@ -1,15 +1,20 @@
 ﻿using Betsson.OnlineWallets.Web.Models;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Net.Http.Json;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Betsson.OnlineWallets.Tests.Models
 {
     public class TestBase
     {
         protected readonly HttpClient _client;
+        protected readonly ITestOutputHelper outputHelper;
 
-        public TestBase()
+        public TestBase(ITestOutputHelper output)
         {
             _client = new HttpClient { BaseAddress = new Uri("http://localhost:3000/") };
+            outputHelper = output;
         }
 
         // Method to get balance in every tests class

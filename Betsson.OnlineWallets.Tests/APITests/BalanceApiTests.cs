@@ -1,11 +1,14 @@
 ﻿using Betsson.OnlineWallets.Tests.Models;
 using FluentAssertions;
 using System.Net;
+using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
     public class BalanceApiTests : TestBase
     {
+        public BalanceApiTests(ITestOutputHelper output) : base(output) { }
+    
         [Fact]
         public async Task ValidateBalanceResponseSuccessfulCode()
         {

@@ -4,11 +4,14 @@ using Betsson.OnlineWallets.Tests.Models;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
+using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
     public class EndToEndTests : TestBase
     {
+        public EndToEndTests(ITestOutputHelper output) : base(output) { }
+        
         [Fact]
         public async Task DepositSuccessfulEndToEndFlow()
         {
@@ -36,6 +39,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
 
             //  Assert that the returned balance is correct (initial amount + deposited amount)
             depositResponse!.Amount.Should().Be(initialBalance + amountToDeposit);
+            outputHelper.WriteLine($"Balance: {depositResponse!.Amount} , initial amount + deposited amount: {initialBalance + amountToDeposit}");
         }
 
         [Fact]
@@ -171,8 +175,48 @@ namespace Betsson.OnlineWallets.Tests.APITests
             // Double check it with balance endpoint
             balance = await GetBalance();
             balance!.Amount.Should().Be(0);
+        }
 
+        [Fact]
+        public async Task WithdrawSlightlyMoreThanAvailableBalance_ShouldFail()
+        {
+            //      Arrange
+            //  Get initial balance
+            var balance = await GetBalance();
+            decimal actualBalance = balance.Amount;
+            decimal minimumAmount = 10;
+            decimal surplusAmount = 0.0001m;
 
+            //  Ensure there is enough balance before proceeding
+            if (actualBalance < minimumAmount)
+            {
+                // Deposit sufficient credit in case of insufficient initial balance
+                var depositRequest = RequestHelper.CreateDepositRequest(minimumAmount);
+                var depositResponse = await _client.PostAsJsonAsync(RequestHelper.DepositEndpoint, depositRequest);
+                // Assert that the deposit response was successful
+                depositResponse.StatusCode.Should().Be(HttpStatusCode.OK, "Test failed: Unable to deposit sufficient credit.");
+                // Update the inital balance for the assertion
+                actualBalance = balance.Amount;
+            }
+            
+            //  Create Withdrawal request
+            var withdrawalRequest = RequestHelper.CreateWithdrawalRequest(actualBalance+ surplusAmount);
+            outputHelper.WriteLine($"Actual balance: {actualBalance} , amount try to withdraw: {actualBalance + surplusAmount}");
+
+            //      Act
+            //  Send the request 
+            var response = await _client.PostAsJsonAsync(RequestHelper.WithdrawalEndpoint, withdrawalRequest);
+
+            //      Assert
+            // Check if the API rejects the request with a 400 Bad Request
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest); 
+
+            // Check if the error message contains "insufficient funds"
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            errorMessage.Should().Contain("insufficient funds", "The error message should contains insufficient funds.");
+
+            //  Check if the error message mentions InsufficientBalanceException
+            errorMessage.Should().Contain(nameof(InsufficientBalanceException));
         }
     }
 }

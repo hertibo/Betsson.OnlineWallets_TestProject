@@ -3,11 +3,14 @@ using Betsson.OnlineWallets.Tests.Models;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
+using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
     public class WithdrawApiTests : TestBase
     {
+        public WithdrawApiTests(ITestOutputHelper output) : base(output) { }
+
         [Fact]
         public async Task ValidateWithdrawalResponseSuccessfulStatusCodeWithZeroAmount()
         {

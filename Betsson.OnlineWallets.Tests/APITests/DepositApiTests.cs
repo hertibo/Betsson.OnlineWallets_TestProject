@@ -2,11 +2,14 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
     public class DepositApiTests : TestBase
     {
+        public DepositApiTests(ITestOutputHelper output) : base(output) { }
+
         [Fact]
         public async Task ValidateDepositResponseSuccessfulStatusCodeWithPositiveAmount()
         {
