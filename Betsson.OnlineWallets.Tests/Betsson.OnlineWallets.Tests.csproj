@@ -18,6 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\Betsson.OnlineWallets.Data\Betsson.OnlineWallets.Data.csproj" />
+    <ProjectReference Include="..\src\Betsson.OnlineWallets.Web\Betsson.OnlineWallets.Web.csproj" />
+    <ProjectReference Include="..\src\Betsson.OnlineWallets\Betsson.OnlineWallets.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
