@@ -39,7 +39,10 @@ namespace Betsson.OnlineWallets.Tests.APITests
 
             //  Assert that the returned balance is correct (initial amount + deposited amount)
             depositResponse!.Amount.Should().Be(initialBalance + amountToDeposit);
-            outputHelper.WriteLine($"Balance: {depositResponse!.Amount} , initial amount + deposited amount: {initialBalance + amountToDeposit}");
+            // Double check it with balance endpoint
+            balance = await GetBalance();
+            balance!.Amount.Should().Be(depositResponse!.Amount);
+            outputHelper.WriteLine($"Deposit response: {depositResponse!.Amount} , initial amount + deposited amount: {initialBalance + amountToDeposit}");
         }
 
         [Fact]
@@ -66,6 +69,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
             //  Check if the balance has increased
             var finalBalance = await GetBalance();
             finalBalance.Amount.Should().Be(initialBalance + (amountToDeposit * depositTimes));
+            outputHelper.WriteLine($"Balance response: {finalBalance.Amount} , Initial amount + deposited amount: {initialBalance + (amountToDeposit * depositTimes)}");
         }
 
 
@@ -107,7 +111,12 @@ namespace Betsson.OnlineWallets.Tests.APITests
 
             //  Check if the withdrawal amount is correct
             withdrawalResponse!.Amount.Should().Be(initialBalance - amountToWithdraw);
+            // Double check it with balance endpoint
+            balance = await GetBalance();
+            balance!.Amount.Should().Be(withdrawalResponse!.Amount);
+            outputHelper.WriteLine($"Withdrawal response: {withdrawalResponse!.Amount} , Initial amount - amountToWithdraw: {initialBalance - amountToWithdraw}");
         }
+        
 
         [Fact]
         public async Task MultipleWithdrawalSuccessfulEndToEndFlowd()
@@ -145,6 +154,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
             //  Check if the balance has decreased
             var finalBalance = await GetBalance();
             finalBalance.Amount.Should().Be(initialBalance - (amountToWithdraw * withdrawalTimes));
+            outputHelper.WriteLine($"Balance response: {finalBalance.Amount} , Initial amount - (amountToWithdraw * withdrawalTimes): {initialBalance - (amountToWithdraw * withdrawalTimes)}");
         }
 
         [Fact]
@@ -175,10 +185,11 @@ namespace Betsson.OnlineWallets.Tests.APITests
             // Double check it with balance endpoint
             balance = await GetBalance();
             balance!.Amount.Should().Be(0);
+            outputHelper.WriteLine($"Balance response: {balance!.Amount}");
         }
 
         [Fact]
-        public async Task WithdrawSlightlyMoreThanAvailableBalance_ShouldFail()
+        public async Task WithdrawSlightlyMoreThanAvailableBalance()
         {
             //      Arrange
             //  Get initial balance
@@ -195,9 +206,10 @@ namespace Betsson.OnlineWallets.Tests.APITests
                 var depositResponse = await _client.PostAsJsonAsync(RequestHelper.DepositEndpoint, depositRequest);
                 // Assert that the deposit response was successful
                 depositResponse.StatusCode.Should().Be(HttpStatusCode.OK, "Test failed: Unable to deposit sufficient credit.");
-                // Update the inital balance for the assertion
-                actualBalance = balance.Amount;
             }
+            // Update the actualBalance balance for the assertion
+            balance = await GetBalance();
+            actualBalance = balance.Amount;
             
             //  Create Withdrawal request
             var withdrawalRequest = RequestHelper.CreateWithdrawalRequest(actualBalance+ surplusAmount);
