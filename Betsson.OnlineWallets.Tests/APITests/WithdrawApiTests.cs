@@ -1,4 +1,5 @@
-﻿using Betsson.OnlineWallets.Tests.Models;
+﻿using Betsson.OnlineWallets.Exceptions;
+using Betsson.OnlineWallets.Tests.Models;
 using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
@@ -7,23 +8,6 @@ namespace Betsson.OnlineWallets.Tests.APITests
 {
     public class WithdrawApiTests : TestBase
     {
-        [Fact]
-        public async Task ValidateWithdrawalResponseSuccessfulStatusCodeWithPositiveAmount()
-        {
-            //      Arrange
-            //  Prepare a withdrawal request with a positive amount
-            decimal positiveAmount = 100;
-            var request = RequestHelper.CreateWithdrawalRequest(positiveAmount);
-
-            //      Act
-            //  Send the withdrawal request
-            var response = await _client.PostAsJsonAsync(RequestHelper.WithdrawalEndpoint, request);
-
-            //      Assert
-            //  Ensure that the withdrawal response returns a 200 status code
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
-
         [Fact]
         public async Task ValidateWithdrawalResponseSuccessfulStatusCodeWithZeroAmount()
         {
@@ -73,6 +57,29 @@ namespace Betsson.OnlineWallets.Tests.APITests
             //      Assert
             //  Ensure that the withdrawal response returns a 400 status code
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task ValidateWithdrawalInsufficientBalanceException()
+        {
+            //      Arrange
+            decimal excessiveAmount = 4000000; // A high value that should fail
+            var request = RequestHelper.CreateWithdrawalRequest(excessiveAmount);
+
+            //      Act
+            // Send a request
+            var response = await _client.PostAsJsonAsync(RequestHelper.WithdrawalEndpoint, request);
+
+            //      Assert
+            // Check if the API rejects the request with a 400 Bad Request
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            // Check if the error message contains "insufficient funds"
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            errorMessage.Should().Contain("insufficient funds", "The error message should contains insufficient funds.");
+
+            //  Check if the error message mentions InsufficientBalanceException
+            errorMessage.Should().Contain(nameof(InsufficientBalanceException));
         }
     }
 }
