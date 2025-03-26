@@ -37,6 +37,8 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
                 Amount = 50,
                 BalanceBefore = 100,
             };
+            
+            // Set up the mock to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
                            .ReturnsAsync(lastWalletEntry);
 

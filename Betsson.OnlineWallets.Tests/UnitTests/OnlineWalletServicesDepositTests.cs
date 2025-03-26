@@ -1,4 +1,5 @@
 ﻿using Betsson.OnlineWallets.Data.Models;
+using Betsson.OnlineWallets.Exceptions;
 using Betsson.OnlineWallets.Models;
 using Betsson.OnlineWallets.Tests.Models;
 using Betsson.OnlineWallets.Web.Models;
@@ -13,15 +14,18 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task DepositShouldAddAmountAndReturnNewBalance()
         {
             //      Arrange
-            //  Set up the mock for a wallet entry and a deposit request
+            //  Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
                 Amount = 50,
                 BalanceBefore = 100,
+                EventTime = DateTimeOffset.Now
             };
 
             // Create the deposit request
             var deposit = new Deposit { Amount = 50 };
+
+            // Set up the mock to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
                            .ReturnsAsync(lastWalletEntry);
 
@@ -38,22 +42,24 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task DepositZeroAmountShouldNotChangeBalance()
         {
             //      Arrange
-            //  Set up the mock for a wallet entry and a deposit request
+            //  Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
                 Amount = 0,
-                BalanceBefore = 200
+                BalanceBefore = 200,
+                EventTime = DateTimeOffset.Now
             };
 
             // Create the deposit request with an amount of 0
-            var deposit = new Deposit { Amount = 0 };
+            var request = new Deposit { Amount = 0 };
 
+            // Set up the mock to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
                            .ReturnsAsync(lastWalletEntry);
 
             //      Act
             //  Call the DepositFundsAsync method to process the deposit
-            var result = await _service.DepositFundsAsync(deposit);
+            var result = await _service.DepositFundsAsync(request);
 
             //      Assert
             //  Verify that the new balance is correct
@@ -75,7 +81,6 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
             //  Verify that the validation passes for the Amount 
             result.ShouldNotHaveValidationErrorFor(d => d.Amount);
         }
-
 
         [Fact]
         public void DepositWithNegativeAmountShouldFailValidation()
