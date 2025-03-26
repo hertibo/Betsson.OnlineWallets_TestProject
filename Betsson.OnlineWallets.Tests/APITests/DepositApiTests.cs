@@ -14,8 +14,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateDepositResponseSuccessfulStatusCodeWithPositiveAmount()
         {
             //      Arrange
+            const decimal positiveAmount = 100;
+
             //  Prepare a deposit request with a positive amount
-            decimal positiveAmount = 100;
             var request = RequestHelper.CreateDepositRequest(positiveAmount);
 
             //      Act
@@ -31,8 +32,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateDepositResponseSuccessfulStatusCodeWithZeroAmount()
         {
             //      Arrange
+            const decimal zeroAmount = 0;
+
             //  Prepare a deposit request with zero amount
-            decimal zeroAmount = 0;
             var depositRequest = RequestHelper.CreateDepositRequest(zeroAmount);
 
             //      Act
@@ -48,8 +50,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateDepositResponeBadStatusCodeWithNegativeAmount()
         {
             //      Arrange
+            const decimal negativeAmont = -1;
+
             //  Prepare a deposit request with a negative amount
-            decimal negativeAmont = -1;
             var request = RequestHelper.CreateDepositRequest(negativeAmont);
 
             //      Act
@@ -65,8 +68,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateDepositResponeBadStatusCodeWithInvalidFormat()
         {
             //      Arrange
+            const string stringAmount = "hundred";
+
             //  Prepare a deposit request with a negative amount
-            string stringAmount = "hundred";
             var request = new { Amount = stringAmount };
 
             //      Act

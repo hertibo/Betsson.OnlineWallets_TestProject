@@ -12,16 +12,20 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task WithdrawRequestShouldDeductAmountAndReturnNewBalanceInCaseOfSufficientBalance()
         {
             //      Arrange
+            const decimal amount = 100;
+            const decimal balanceBefore = 200;
+            const decimal withdrawAmount = 50;
+
             // Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
-                Amount = 100,
-                BalanceBefore = 200,
+                Amount = amount,
+                BalanceBefore = balanceBefore,
                 EventTime = DateTimeOffset.Now
             };
 
             //  Create a request request
-            var request = new Withdrawal { Amount = 50 };
+            var request = new Withdrawal { Amount = withdrawAmount };
 
             // Mock repository to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
@@ -32,47 +36,60 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
             var result = await _service.WithdrawFundsAsync(request);
 
             //      Assert
-            // Verify that the new balance is correct (Expected new balance is 100+200 - 50 = 250)
-            Assert.Equal(250, result.Amount);
+            // Verify that the new balance is correct
+            Assert.Equal(amount+balanceBefore-withdrawAmount, result.Amount);
         }
 
         [Fact]
         public async Task WithdrawZeroAmountShouldNotChangeBalance()
         {
-            // Arrange
+            //       Arrange
+            const decimal amount = 100;
+            const decimal balanceBefore = 200;
+            const decimal withdrawAmount = 0;
+            
+            //  Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
-                Amount = 100,
-                BalanceBefore = 200,
+                Amount = amount,
+                BalanceBefore = balanceBefore,
                 EventTime = DateTimeOffset.Now
             };
+            
+            //Create a withdrawal request 
+            var request = new Withdrawal { Amount = withdrawAmount };
 
-            var request = new Withdrawal { Amount = 0 };
-
+            // Mock repository to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
                            .ReturnsAsync(lastWalletEntry);
 
-            // Act
+            //      Act
+            //  Call the WithdrawFundsAsync method to process the request
             var result = await _service.WithdrawFundsAsync(request);
 
-            // Assert
-            Assert.Equal(300, result.Amount); // 100+200 - 0 = 300
+            //       Assert
+            //  Verify that the new balance is correct
+            Assert.Equal(amount+ balanceBefore-withdrawAmount, result.Amount); 
         }
 
         [Fact]
         public async Task WithdrawRequestShouldThrowInsufficientBalanceExceptionInCaseOfInsufficientBalance()
         {
             //      Arrange
+            const decimal amount = 50;
+            const decimal balanceBefore = 100;
+            const decimal withdrawAmount = 200;
+
             //   Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
-                Amount = 50,
-                BalanceBefore = 100,
+                Amount = amount,
+                BalanceBefore = balanceBefore,
                 EventTime = DateTimeOffset.Now
             };
 
-            //Create a request request
-            var request = new Withdrawal { Amount = 200 };
+            //  Create a withdrawal request 
+            var request = new Withdrawal { Amount = withdrawAmount};
 
             // Mock repository to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
@@ -87,12 +104,14 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task WithdrawRequestShouldThrowInsufficientBalanceExceptionWhenNoOnlineWalletEntryExisty()
         {
             //      Arrange
-            //    Mock repository to return the last wallet entry
-            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
-                           .ReturnsAsync((OnlineWalletEntry)null);
+            const decimal withdrawAmount = 50;
 
-            //Create a request request
-            var request = new Withdrawal { Amount = 50 };
+            //  Mock repository to return the last wallet entry
+            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
+                           .ReturnsAsync((OnlineWalletEntry?)null);
+
+            //  Create a withdrawal request 
+            var request = new Withdrawal { Amount = withdrawAmount };
 
             //       Act & Assert
             //  Verify that an exception is thrown for insufficient balance

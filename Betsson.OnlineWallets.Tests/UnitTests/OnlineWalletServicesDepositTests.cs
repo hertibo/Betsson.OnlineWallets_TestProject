@@ -14,44 +14,20 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task DepositShouldAddAmountAndReturnNewBalance()
         {
             //      Arrange
+            const decimal amount = 50;
+            const decimal balanceBefore = 100;
+            const decimal depositAmount = 50;
+            
             //  Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
-                Amount = 50,
-                BalanceBefore = 100,
+                Amount = amount,
+                BalanceBefore = balanceBefore,
                 EventTime = DateTimeOffset.Now
             };
 
             // Create the deposit request
-            var deposit = new Deposit { Amount = 50 };
-
-            // Set up the mock to return the last wallet entry
-            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
-                           .ReturnsAsync(lastWalletEntry);
-
-            //      Act
-            //  Call the DepositFundsAsync method to process the deposit
-            var result = await _service.DepositFundsAsync(deposit);
-
-            //      Assert
-            //  Verify that the new balance is correct
-            Assert.Equal(200, result.Amount);
-        }
-
-        [Fact]
-        public async Task DepositZeroAmountShouldNotChangeBalance()
-        {
-            //      Arrange
-            //  Set up the mock for the last wallet entry
-            var lastWalletEntry = new OnlineWalletEntry
-            {
-                Amount = 0,
-                BalanceBefore = 200,
-                EventTime = DateTimeOffset.Now
-            };
-
-            // Create the deposit request with an amount of 0
-            var request = new Deposit { Amount = 0 };
+            var request = new Deposit { Amount = depositAmount };
 
             // Set up the mock to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
@@ -63,15 +39,49 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
 
             //      Assert
             //  Verify that the new balance is correct
-            Assert.Equal(200, result.Amount);
+            Assert.Equal(amount+balanceBefore+depositAmount, result.Amount);
+        }
+
+        [Fact]
+        public async Task DepositZeroAmountShouldNotChangeBalance()
+        {
+            //      Arrange
+            const decimal amount = 0;
+            const decimal balanceBefore = 200;
+            const decimal depositAmount = 0;
+            
+            //  Set up the mock for the last wallet entry
+            var lastWalletEntry = new OnlineWalletEntry
+            {
+                Amount = amount,
+                BalanceBefore = balanceBefore,
+                EventTime = DateTimeOffset.Now
+            };
+
+            // Create the deposit request with an amount of 0
+            var request = new Deposit { Amount = depositAmount };
+
+            // Set up the mock to return the last wallet entry
+            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
+                           .ReturnsAsync(lastWalletEntry);
+
+            //      Act
+            //  Call the DepositFundsAsync method to process the deposit
+            var result = await _service.DepositFundsAsync(request);
+
+            //      Assert
+            //  Verify that the new balance is correct
+            Assert.Equal(amount + balanceBefore + depositAmount, result.Amount);
         }
 
         [Fact]
         public void DepositWithValidAmountShouldPassValidation()
         {
             //      Arrange
+            const decimal positivDepositAmount = 100;
+
             //  Create a new DepositRequest with a valid positiv amount to test validation
-            var request = new DepositRequest { Amount = 100 };
+            var request = new DepositRequest { Amount = positivDepositAmount };
 
             //      Act
             //  Validate the DepositRequest using the validator
@@ -86,8 +96,10 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public void DepositWithNegativeAmountShouldFailValidation()
         {
             //      Arrange
+            const decimal negativeDepositAmount = -50;
+
             //  Create a new DepositRequest with a negative amount to test validation
-            var request = new DepositRequest { Amount = -50 };
+            var request = new DepositRequest { Amount = negativeDepositAmount };
 
             //      Act
             //  Validate the DepositRequest using the validator

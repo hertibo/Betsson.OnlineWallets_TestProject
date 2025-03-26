@@ -15,8 +15,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateWithdrawalResponseSuccessfulStatusCodeWithZeroAmount()
         {
             //      Arrange
+            const decimal zeroAmount = 0;
+
             //  Prepare a withdrawal request with zero amount
-            decimal zeroAmount = 0;
             var request = RequestHelper.CreateWithdrawalRequest(zeroAmount);
 
             //      Act
@@ -32,8 +33,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateWithdrawalResponeBadStatusCodeWithNegativeAmount()
         {
             //      Arrange
+            const decimal negativeAmont = -1;
+
             //  Prepare a withdrawal request with negative amount
-            decimal negativeAmont = -1;
             var request = RequestHelper.CreateWithdrawalRequest(negativeAmont);
 
             //      Act
@@ -49,8 +51,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateWithdrawalResponeBadStatusCodeWithInvalidFormat()
         {
             //      Arrange
+            const string stringAmount = "ten";
+
             //  Prepare a withdrawal request with a negative amount
-            string stringAmount = "ten";
             var request = new { Amount = stringAmount };
 
             //      Act
@@ -66,7 +69,9 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task ValidateWithdrawalInsufficientBalanceException()
         {
             //      Arrange
-            decimal excessiveAmount = 4000000; // A high value that should fail
+            const decimal excessiveAmount = 4000000;
+
+            //  Prepare a withdrawal request with a high value that should fail
             var request = RequestHelper.CreateWithdrawalRequest(excessiveAmount);
 
             //      Act

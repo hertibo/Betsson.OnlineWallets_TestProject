@@ -16,7 +16,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task DepositSuccessfulEndToEndFlow()
         {
             //      Arrange
-            decimal amountToDeposit = 150;
+            const decimal amountToDeposit = 150;
 
             //  Get initial balance
             var balance = await GetBalance();
@@ -50,7 +50,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
         {
             //      Arrange
             int depositTimes = 4;
-            decimal amountToDeposit = 8;
+            const decimal amountToDeposit = 8;
 
             //  Get initial balance
             var balance = await GetBalance();
@@ -77,7 +77,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
         public async Task WithdrawalSuccessfulEndToEndFlow()
         {
             //      Arrange
-            decimal amountToWithdraw = 85;
+            const decimal amountToWithdraw = 85;
 
             //  Get initial balance
             var balance = await GetBalance();
@@ -123,7 +123,7 @@ namespace Betsson.OnlineWallets.Tests.APITests
         {
             //      Arrange
             int withdrawalTimes = 3;
-            decimal amountToWithdraw = 50;
+            const decimal amountToWithdraw = 50;
 
             //  Get initial balance
             var balance = await GetBalance();

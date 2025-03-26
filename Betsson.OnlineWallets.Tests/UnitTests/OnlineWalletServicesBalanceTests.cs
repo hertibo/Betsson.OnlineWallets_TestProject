@@ -12,13 +12,13 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task GetBalanceShouldReturnZeroWhenNoOnlineWalletEntryExist()
         {
             //      Arrange
-            //  Set up the mock to return a wallet entry
+            // Set up the mock to return the last wallet entry
             _mockRepository
                 .Setup(repo => repo.GetLastOnlineWalletEntryAsync())
-                .ReturnsAsync((OnlineWalletEntry)null);
+                .ReturnsAsync((OnlineWalletEntry?)null);
 
             //      Act
-            //  Call the GetBalance method
+            //  Call the GetBalanceAsync method
             var result = await _service.GetBalanceAsync();
 
             //      Assert
@@ -31,24 +31,27 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
         public async Task GetBalanceShouldReturnCorrectBalanceWhenOnlineWalletEntryExists()
         {
             //      Arrange
-            //  Set up the mock to return a wallet entry
+            const decimal amount = 50;
+            const decimal balanceBefore = 100;
+
+            //  Set up the mock for the last wallet entry
             var lastWalletEntry = new OnlineWalletEntry
             {
-                Amount = 50,
-                BalanceBefore = 100,
+                Amount = amount,
+                BalanceBefore = balanceBefore,
             };
-            
+
             // Set up the mock to return the last wallet entry
             _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
                            .ReturnsAsync(lastWalletEntry);
 
             //      Act
-            // Call the GetBalance method
+            //  Call the GetBalance method
             var result = await _service.GetBalanceAsync();
 
             //      Assert
             //  Verify that the returned balance is correct
-            Assert.Equal(150, result.Amount);
+            Assert.Equal(amount+balanceBefore, result.Amount);
         }
     }
 }
