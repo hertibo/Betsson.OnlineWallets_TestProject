@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
-    public class BalanceApiTests : TestBase
+    public class BalanceApiTests : APITestBase
     {
         public BalanceApiTests(ITestOutputHelper output) : base(output) { }
     

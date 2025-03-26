@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Betsson.OnlineWallets.Tests.APITests
 {
-    public class EndToEndTests : TestBase
+    public class EndToEndTests : APITestBase
     {
         public EndToEndTests(ITestOutputHelper output) : base(output) { }
         

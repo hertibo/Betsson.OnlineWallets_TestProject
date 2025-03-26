@@ -6,12 +6,12 @@ using Xunit.Sdk;
 
 namespace Betsson.OnlineWallets.Tests.Models
 {
-    public class TestBase
+    public class APITestBase
     {
         protected readonly HttpClient _client;
         protected readonly ITestOutputHelper outputHelper;
 
-        public TestBase(ITestOutputHelper output)
+        public APITestBase(ITestOutputHelper output)
         {
             _client = new HttpClient { BaseAddress = new Uri("http://localhost:3000/") };
             outputHelper = output;

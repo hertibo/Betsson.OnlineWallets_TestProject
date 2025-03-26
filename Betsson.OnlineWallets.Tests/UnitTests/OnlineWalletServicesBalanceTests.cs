@@ -1,23 +1,12 @@
 ﻿using Betsson.OnlineWallets.Data.Models;
-using Betsson.OnlineWallets.Data.Repositories;
-using Betsson.OnlineWallets.Services;
+using Betsson.OnlineWallets.Tests.Models;
 using Moq;
-using System;
-using Xunit;
 
 
 namespace Betsson.OnlineWallets.Tests.UnitTests
 {
-    public class OnlineWalletServicesTests
+    public class OnlineWalletServicesBalanceTests : UnitTestBase
     {
-        private readonly Mock<IOnlineWalletRepository> _mockRepository;
-        private readonly OnlineWalletService _service;
-
-        public OnlineWalletServicesTests()
-        {
-            _mockRepository = new Mock<IOnlineWalletRepository>();
-            _service = new OnlineWalletService(_mockRepository.Object);
-        }
 
         [Fact]
         public async Task GetBalanceShouldReturnZeroWhenNoOnlineWalletEntryExist()
@@ -59,8 +48,5 @@ namespace Betsson.OnlineWallets.Tests.UnitTests
             //  Verify that the returned balance is correct
             Assert.Equal(150, result.Amount);
         }
-
-
-
     }
 }
