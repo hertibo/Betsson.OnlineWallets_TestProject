@@ -1,12 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Betsson.OnlineWallets.Data.Models;
+using Betsson.OnlineWallets.Models;
+using Betsson.OnlineWallets.Tests.Models;
+using Betsson.OnlineWallets.Web.Models;
+using FluentValidation.TestHelper;
+using Moq;
 
 namespace Betsson.OnlineWallets.Tests.UnitTests
 {
-    internal class OnlineWalletServicesDepositTests
+    public class OnlineWalletServicesDepositTests : UnitTestBase
     {
+        [Fact]
+        public async Task DepositShouldAddAmountAndReturnNewBalance()
+        {
+            //      Arrange
+            //  Set up the mock for a wallet entry and a deposit request
+            var lastWalletEntry = new OnlineWalletEntry
+            {
+                Amount = 50,
+                BalanceBefore = 100,
+            };
+
+            // Create the deposit request
+            var deposit = new Deposit { Amount = 50 };
+            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
+                           .ReturnsAsync(lastWalletEntry);
+
+            //      Act
+            //  Call the DepositFundsAsync method to process the deposit
+            var result = await _service.DepositFundsAsync(deposit);
+
+            //      Assert
+            //  Verify that the new balance is correct
+            Assert.Equal(200, result.Amount);
+        }
+
+        [Fact]
+        public async Task DepositZeroAmountShouldNotChangeBalance()
+        {
+            //      Arrange
+            //  Set up the mock for a wallet entry and a deposit request
+            var lastWalletEntry = new OnlineWalletEntry
+            {
+                Amount = 0,
+                BalanceBefore = 200
+            };
+
+            // Create the deposit request with an amount of 0
+            var deposit = new Deposit { Amount = 0 };
+
+            _mockRepository.Setup(repo => repo.GetLastOnlineWalletEntryAsync())
+                           .ReturnsAsync(lastWalletEntry);
+
+            //      Act
+            //  Call the DepositFundsAsync method to process the deposit
+            var result = await _service.DepositFundsAsync(deposit);
+
+            //      Assert
+            //  Verify that the new balance is correct
+            Assert.Equal(200, result.Amount);
+        }
+
+        [Fact]
+        public void DepositWithValidAmountShouldPassValidation()
+        {
+            //      Arrange
+            //  Create a new DepositRequest with a valid positiv amount to test validation
+            var request = new DepositRequest { Amount = 100 };
+
+            //      Act
+            //  Validate the DepositRequest using the validator
+            var result = _validator.TestValidate(request);
+
+            //      Assert
+            //  Verify that the validation passes for the Amount 
+            result.ShouldNotHaveValidationErrorFor(d => d.Amount);
+        }
+
+
+        [Fact]
+        public void DepositWithNegativeAmountShouldFailValidation()
+        {
+            //      Arrange
+            //  Create a new DepositRequest with a negative amount to test validation
+            var request = new DepositRequest { Amount = -50 };
+
+            //      Act
+            //  Validate the DepositRequest using the validator
+            var result = _validator.TestValidate(request);
+
+            //      Assert
+            //  Verify that the validation fails for the Amount property when it's negative
+            result.ShouldHaveValidationErrorFor(d => d.Amount);
+        }
     }
 }

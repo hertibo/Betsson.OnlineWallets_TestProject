@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Betsson.OnlineWallets.Tests.UnitTests
 {
-    internal class OnlineWalletServicesWithdrawalTests
+    internal class OnlineWalletServicesWithdrawalTests 
     {
     }
 }

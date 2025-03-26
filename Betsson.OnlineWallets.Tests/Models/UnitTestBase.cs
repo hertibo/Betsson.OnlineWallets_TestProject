@@ -1,11 +1,7 @@
 ﻿using Betsson.OnlineWallets.Data.Repositories;
 using Betsson.OnlineWallets.Services;
+using Betsson.OnlineWallets.Web.Validators;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Betsson.OnlineWallets.Tests.Models
 {
@@ -13,11 +9,13 @@ namespace Betsson.OnlineWallets.Tests.Models
     {
         public readonly Mock<IOnlineWalletRepository> _mockRepository;
         public readonly OnlineWalletService _service;
+        public readonly DepositRequestValidator _validator;
 
         public UnitTestBase()
         {
             _mockRepository = new Mock<IOnlineWalletRepository>();
             _service = new OnlineWalletService(_mockRepository.Object);
+            _validator = new DepositRequestValidator();
         }
     }
 }
