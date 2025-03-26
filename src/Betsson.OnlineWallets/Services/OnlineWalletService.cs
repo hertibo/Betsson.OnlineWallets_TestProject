@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace Betsson.OnlineWallets.Services
 {
-    internal class OnlineWalletService : IOnlineWalletService
+    public class OnlineWalletService : IOnlineWalletService
     {
         private readonly IOnlineWalletRepository _onlineWalletRepository;
 
